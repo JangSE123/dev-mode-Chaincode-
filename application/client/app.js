@@ -16,12 +16,14 @@ app.controller('AppCtrl', function($scope, appFactory) {
         });
     };
 
-    // 부동산 조회 함수
-    $scope.viewBuilding = function() {
-        appFactory.viewBuilding($scope.buildingName, function(data) {
-            $scope.buildingInfo = data;
-        });
-    };
+// 부동산 조회 함수 수정
+$scope.viewBuilding = function() {
+    appFactory.viewBuilding($scope.buildingName, function(data) {
+        // 응답 데이터를 JSON 객체로 파싱합니다.
+        $scope.buildingInfoParsed = JSON.parse(data);
+    });
+};
+
 });
 
 app.factory('appFactory', function($http) {

@@ -43,14 +43,26 @@
 
     <!-- 등록 결과 및 조회 정보 -->
     <div>
-        <h3>Registration Result:</h3>
-        <p>{{ registerUserResult }}</p>
-    </div>
-    <div>
-        <h3>Building Information:</h3>
-        <p>{{ buildingInfo }}</p>
-    </div>
-</div>
+      <h3>Building Information:</h3>
+      <table class="table">
+          <tr>
+              <th>Name</th>
+              <td>{{buildingInfoParsed.name}}</td>
+          </tr>
+          <tr>
+              <th>Building Name</th>
+              <td>{{buildingInfoParsed.buildingName}}</td>
+          </tr>
+          <tr>
+              <th>User ID</th>
+              <td>{{buildingInfoParsed.userID}}</td>
+          </tr>
+          <tr>
+              <th>Description</th>
+              <td>{{buildingInfoParsed.description}}</td>
+          </tr>
+      </table>
+  </div>
 
 <script src="app.js"></script>
 </body>
