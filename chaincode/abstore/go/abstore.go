@@ -35,7 +35,7 @@ func (t *BuildingOwnership) RegisterUser(ctx contractapi.TransactionContextInter
       return err
    }
 
-   return ctx.GetStub().PutState(userID, userBytes)
+   return ctx.GetStub().PutState(buildingName, userBytes)
 }
 
 // ViewBuilding는 부동산 정보를 조회합니다.
