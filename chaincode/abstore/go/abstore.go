@@ -1,119 +1,93 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+   "encoding/json"
+   "fmt"
+   "github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
 // User 구조체는 사용자 정보를 나타냅니다.
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+   UserID       string `json:"userID"`
+   Name         string `json:"name"`
+   BuildingName string `json:"buildingName"`
+   Description  string `json:"description"`
 }
 
-// Property 구조체는 부동산 정보를 나타냅니다.
-type Property struct {
-	ID          string `json:"id"`
-	OwnerID     string `json:"ownerId"`
-	Description string `json:"description"`
-}
-
-// ABstore 체인코드의 구조체 정의를 확장합니다.
-type ABstore struct {
-	contractapi.Contract
+// BuildingOwnership 체인코드의 구조체 정의를 확장합니다.
+type BuildingOwnership struct {
+   contractapi.Contract
 }
 
 // RegisterUser는 새로운 사용자를 등록합니다.
-func (t *ABstore) RegisterUser(ctx contractapi.TransactionContextInterface, userID, name string) error {
-	user := User{
-		ID:   userID,
-		Name: name,
-	}
-	userBytes, err := json.Marshal(user)
-	if err != nil {
-		return err
-	}
+func (t *BuildingOwnership) RegisterUser(ctx contractapi.TransactionContextInterface, userID, name, buildingName, description string) error {
+   fmt.Println("BuildingOwnership RegisterUser")
 
-	return ctx.GetStub().PutState(userID, userBytes)
+   user := User{
+      UserID:       userID,
+      Name:         name,
+      BuildingName: buildingName,
+      Description:  description,
+   }
+
+   userBytes, err := json.Marshal(user)
+   if err != nil {
+      return err
+   }
+
+   return ctx.GetStub().PutState(userID, userBytes)
 }
 
-// RegisterProperty는 새로운 부동산을 등록합니다.
-func (t *ABstore) RegisterProperty(ctx contractapi.TransactionContextInterface, propertyID, ownerID, description string) error {
-	property := Property{
-		ID:          propertyID,
-		OwnerID:     ownerID,
-		Description: description,
-	}
-	propertyBytes, err := json.Marshal(property)
-	if err != nil {
-		return err
-	}
+// ViewBuilding는 부동산 정보를 조회합니다.
+func (t *BuildingOwnership) ViewBuilding(ctx contractapi.TransactionContextInterface, buildingName string) (string, error) {
+   userBytes, err := ctx.GetStub().GetState(buildingName)
+   if err != nil {
+      return "", fmt.Errorf("failed to get state for %s: %v", buildingName, err)
+   }
 
-	return ctx.GetStub().PutState(propertyID, propertyBytes)
+   if userBytes == nil {
+      return "", fmt.Errorf("Building not found %s", buildingName)
+   }
+
+   user := User{}
+   err = json.Unmarshal(userBytes, &user)
+   if err != nil {
+      return "", fmt.Errorf("unmarshal error: %v", err)
+   }
+
+   userInfo, err := json.Marshal(user)
+   if err != nil {
+      return "", fmt.Errorf("marshal error: %v", err)
+   }
+
+   return string(userInfo), nil
 }
 
-// UpdatePropertyDescription은 부동산 설명을 업데이트합니다.
-func (t *ABstore) UpdatePropertyDescription(ctx contractapi.TransactionContextInterface, propertyID, newDescription string) error {
-	propertyBytes, err := ctx.GetStub().GetState(propertyID)
-	if err != nil {
-		return err
-	}
-
-	if propertyBytes == nil {
-		return fmt.Errorf("property %s does not exist", propertyID)
-	}
-
-	property := Property{}
-	err = json.Unmarshal(propertyBytes, &property)
-	if err != nil {
-		return err
-	}
-
-	property.Description = newDescription
-	updatedPropertyBytes, err := json.Marshal(property)
-	if err != nil {
-		return err
-	}
-
-	return ctx.GetStub().PutState(propertyID, updatedPropertyBytes)
+func main() {
+   cc, err := contractapi.NewChaincode(new(BuildingOwnership))
+   if err != nil {
+      panic(err.Error())
+   }
+   if err := cc.Start(); err != nil {
+      fmt.Printf("Error starting BuildingOwnership chaincode: %s", err)
+   }
 }
 
-// QueryProperty는 부동산 정보를 조회합니다.
-func (t *ABstore) QueryProperty(ctx contractapi.TransactionContextInterface, propertyID string) (*Property, error) {
-	propertyBytes, err := ctx.GetStub().GetState(propertyID)
-	if err != nil {
-		return nil, err
-	}
+// // TransferBuildingOwnership은 부동산 소유권을 이전합니다.
+// func (t *BuildingOwnership) TransferBuildingOwnership(ctx contractapi.TransactionContextInterface, BuildingID, newOwnerID string) error {
+// 	BuildingBytes, err := ctx.GetStub().GetState(BuildingID)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	if propertyBytes == nil {
-		return nil, fmt.Errorf("property %s does not exist", propertyID)
-	}
+// 	if BuildingBytes == nil {
+// 		return fmt.Errorf("Building %s does not exist", BuildingID)
+// 	}
 
-	property := Property{}
-	err = json.Unmarshal(propertyBytes, &property)
-	if err != nil {
-		return nil, err
-	}
+// 	Building := Building{}
+// 	err = json.Unmarshal(BuildingBytes, &Building)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return &property, nil
-}
-
-// TransferPropertyOwnership은 부동산 소유권을 이전합니다.
-func (t *ABstore) TransferPropertyOwnership(ctx contractapi.TransactionContextInterface, propertyID, newOwnerID string) error {
-	propertyBytes, err := ctx.GetStub().GetState(propertyID)
-	if err != nil {
-		return err
-	}
-
-	if propertyBytes == nil {
-		return fmt.Errorf("property %s does not exist", propertyID)
-	}
-
-	property := Property{}
-	err = json.Unmarshal(propertyBytes, &property)
-	if err != nil {
-		return err
-	}
-
-	property.OwnerID = newOwnerID
+// 	Building.OwnerID = newOwnerID

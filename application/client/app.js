@@ -2,37 +2,48 @@
 
 var app = angular.module('application', []);
 
-app.controller('AppCtrl', function($scope, appFactory){
-   $("#success_init").hide();
-   $("#success_qurey").hide();
-   $scope.initAB = function(){
-       appFactory.initAB($scope.abstore, function(data){
-           if(data == "")
-           $scope.init_ab = "success";
-           $("#success_init").show();
-       });
-   }
-   $scope.queryAB = function(){
-       appFactory.queryAB($scope.walletid, function(data){
-           $scope.query_ab = data;
-           $("#success_qurey").show();
-       });
-   }
+app.controller('AppCtrl', function($scope, appFactory) {
+    // 사용자 등록 함수
+    $scope.registerUser = function() {
+        var user = {
+            userID: $scope.user.userID,
+            name: $scope.user.name,
+            buildingName: $scope.user.buildingName,
+            description: $scope.user.description
+        };
+        appFactory.registerUser(user, function(data) {
+            $scope.registerUserResult = data;
+        });
+    };
+
+    // 부동산 조회 함수
+    $scope.viewBuilding = function() {
+        appFactory.viewBuilding($scope.buildingName, function(data) {
+            $scope.buildingInfo = data;
+        });
+    };
 });
-app.factory('appFactory', function($http){
-      
+
+app.factory('appFactory', function($http) {
     var factory = {};
- 
-    factory.initAB = function(data, callback){
-        $http.get('/init?a='+data.a+'&aval='+data.aval+'&b='+data.b+'&bval='+data.bval+'&c='+data.c+'&cval='+data.cval).success(function(output){
-            callback(output)
+
+    // 사용자 등록을 위한 HTTP POST 요청 함수
+    factory.registerUser = function(user, callback) {
+        $http.post('/registerUser', user).then(function(response) {
+            callback(response.data);
+        }, function(error) {
+            callback({ error: error });
         });
-    }
-    factory.queryAB = function(name, callback){
-        $http.get('/query?name='+name).success(function(output){
-            callback(output)
+    };
+
+    // 부동산 조회를 위한 HTTP GET 요청 함수
+    factory.viewBuilding = function(buildingName, callback) {
+        $http.get('/viewBuilding?buildingName=' + buildingName).then(function(response) {
+            callback(response.data);
+        }, function(error) {
+            callback({ error: error });
         });
-    }
+    };
+
     return factory;
- });
- 
+});
