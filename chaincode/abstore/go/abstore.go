@@ -20,155 +20,51 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
-// ABstore Chaincode implementation
-type ABstore struct {
+// RealEstateChaincode 구조체 정의
+type RealEstateChaincode struct {
 	contractapi.Contract
 }
 
-func (t *ABstore) Init(ctx contractapi.TransactionContextInterface, A string, Aval int, B string, Bval int, C string, Cval int) error {
-	fmt.Println("ABstore Init")
-	var err error
-	// Initialize the chaincode
-	fmt.Printf("Aval = %d, Bval = %d\n, Cval = %d\n", Aval, Bval,Cval)
-	// Write the state to the ledger
-	err = ctx.GetStub().PutState(A, []byte(strconv.Itoa(Aval)))
-	if err != nil {
-		return err
-	}
-
-	err = ctx.GetStub().PutState(B, []byte(strconv.Itoa(Bval)))
-	if err != nil {
-		return err
-	}
-
-	err = ctx.GetStub().PutState(C, []byte(strconv.Itoa(Cval)))
-	if err != nil {
-		return err
-	}
-
-
+// 소유주 등록 함수
+func (t *RealEstateChaincode) CreateOwner(ctx contractapi.TransactionContextInterface, ownerID string) error {
+	// TODO: 구현
 	return nil
 }
 
-// Transaction makes payment of X units from A to B
-func (t *ABstore) Invoke(ctx contractapi.TransactionContextInterface, A, B, C string, X int) error {
-	var err error
-	var Aval int
-	var Bval int
-	var Cval int
-	// Get the state from the ledger
-	// TODO: will be nice to have a GetAllState call to ledger
-	Avalbytes, err := ctx.GetStub().GetState(A)
-	if err != nil {
-		return fmt.Errorf("Failed to get state")
-	}
-	if Avalbytes == nil {
-		return fmt.Errorf("Entity not found")
-	}
-	Aval, _ = strconv.Atoi(string(Avalbytes))
-
-	Bvalbytes, err := ctx.GetStub().GetState(B)
-	if err != nil {
-		return fmt.Errorf("Failed to get state")
-	}
-	if Bvalbytes == nil {
-		return fmt.Errorf("Entity not found")
-	}
-	Bval, _ = strconv.Atoi(string(Bvalbytes))
-
-	Cvalbytes, err := ctx.GetStub().GetState(C)
-	if err != nil {
-		return fmt.Errorf("Failed to get state")
-	}
-	if Cvalbytes == nil {
-		return fmt.Errorf("Entity not found")
-	}
-	Cval, _ = strconv.Atoi(string(Cvalbytes))
-	
-	// Perform the execution
-	Aval = Aval - X
-	Bval = Bval + X - ( X / 10 )
-	Cval = Cval + ( X / 10 )
-	fmt.Printf("Aval = %d, Bval = %d, Cval = %d\n", Aval, Bval, Cval)
-
-	// Write the state back to the ledger
-	err = ctx.GetStub().PutState(A, []byte(strconv.Itoa(Aval)))
-	if err != nil {
-		return err
-	}
-
-	err = ctx.GetStub().PutState(B, []byte(strconv.Itoa(Bval)))
-	if err != nil {
-		return err
-	}
-
-	err = ctx.GetStub().PutState(C, []byte(strconv.Itoa(Cval)))
-	if err != nil {
-		return err
-	}
-
+// 구매자 등록 함수
+func (t *RealEstateChaincode) CreateCustomer(ctx contractapi.TransactionContextInterface, customerID string) error {
+	// TODO: 구현
 	return nil
 }
 
-// Delete  an entity from state
-func (t *ABstore) Delete(ctx contractapi.TransactionContextInterface, A string) error {
-
-	// Delete the key from the state in ledger
-	err := ctx.GetStub().DelState(A)
-	if err != nil {
-		return fmt.Errorf("Failed to delete state")
-	}
-
+// 건물 소유권 등록 함수
+func (t *RealEstateChaincode) CreateBuildingOwnership(ctx contractapi.TransactionContextInterface, ownerID, buildingID string) error {
+	// TODO: 구현
 	return nil
 }
 
-// Query callback representing the query of a chaincode
-func (t *ABstore) Query(ctx contractapi.TransactionContextInterface, A string) (string, error) {
-	var err error
-	// Get the state from the ledger
-	Avalbytes, err := ctx.GetStub().GetState(A)
-	if err != nil {
-		jsonResp := "{\"Error\":\"Failed to get state for " + A + "\"}"
-		return "", errors.New(jsonResp)
-	}
-
-	if Avalbytes == nil {
-		jsonResp := "{\"Error\":\"Nil amount for " + A + "\"}"
-		return "", errors.New(jsonResp)
-	}
-
-	jsonResp := "{\"Name\":\"" + A + "\",\"Amount\":\"" + string(Avalbytes) + "\"}"
-	fmt.Printf("Query Response:%s\n", jsonResp)
-	return string(Avalbytes), nil
+// 건물 소유권 조회 함수
+func (t *RealEstateChaincode) ViewBuildingOwnership(ctx contractapi.TransactionContextInterface, buildingID string) (string, error) {
+	// TODO: 구현
+	return "", nil
 }
 
-func (t *ABstore) GetAllQuery(ctx contractapi.TransactionContextInterface) ([]string, error) {
-    resultsIterator, err := ctx.GetStub().GetStateByRange("", "")
-    if err != nil {
-        return nil, err
-    }
-    defer resultsIterator.Close()
-    var wallet []string
-    for resultsIterator.HasNext() {
-        queryResponse, err := resultsIterator.Next()
-        if err != nil {
-            return nil, err
-        }
-        jsonResp := "{\"Name\":\"" + string(queryResponse.Key) + "\",\"Amount\":\"" + string(queryResponse.Value) + "\"}"
-        wallet = append(wallet, jsonResp)
-    }
-    return wallet, nil
+// 건물 소유권 교환 함수
+func (t *RealEstateChaincode) TradeBuildingOwnership(ctx contractapi.TransactionContextInterface, buyerID, buildingID string) error {
+	// TODO: 구현
+	return nil
 }
 
 func main() {
-	cc, err := contractapi.NewChaincode(new(ABstore))
+	cc, err := contractapi.NewChaincode(new(RealEstateChaincode))
 	if err != nil {
 		panic(err.Error())
 	}
 	if err := cc.Start(); err != nil {
-		fmt.Printf("Error starting ABstore chaincode: %s", err)
+		fmt.Printf("Error starting RealEstateChaincode: %s", err)
 	}
 }
