@@ -1,55 +1,57 @@
 <!DOCTYPE html>
-<html>
- <head>
-   <title>Hyperledger Fabric AB Store Application</title>
+<html lang="en" ng-app="application">
+<head>
+    <meta charset="UTF-8">
+    <title>Hyperledger Fabric AB Store Application</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
+</head>
+<body ng-controller="AppCtrl">
 
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
+<div class="container">
+    <!-- 사용자 등록 폼 -->
+    <h2>Register User</h2>
+    <form ng-submit="registerUser()">
+        <div class="form-group">
+            <label>User ID</label>
+            <input type="text" class="form-control" ng-model="user.userID" required>
+        </div>
+        <div class="form-group">
+            <label>Name</label>
+            <input type="text" class="form-control" ng-model="user.name" required>
+        </div>
+        <div class="form-group">
+            <label>Building Name</label>
+            <input type="text" class="form-control" ng-model="user.buildingName" required>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <input type="text" class="form-control" ng-model="user.description" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Register User</button>
+    </form>
 
-   <style type="text/css">
-     header{
-       background-color: lightgray;
-       font-size:20px;
-       padding:20px;
-     }
-     header, .form-group{
-       margin-bottom: 3%;
-     }
-     .form-group{
-       width:50%;
-     }
-     #body{
-       margin-left:3%;
-       margin-right:3%;
-     }
-     .form-control{
-       margin: 8px;
-     }
-     label{
-       font-size:20px;
-     }
-   </style>
- </head>
- <body ng-app="application" ng-controller="AppCtrl">
-   <!-- 사용자 등록 폼 추가 -->
-<div class="form-group">
-  <label>Register User</label>
-  <input class="form-control" type="text" placeholder="User ID" ng-model="user.id">
-  <input class="form-control" type="text" placeholder="Name" ng-model="user.name">
-  <input type="submit" value="Register User" class="btn btn-primary" ng-click="registerUser()">
+    <!-- 부동산 조회 폼 -->
+    <h2>View Building</h2>
+    <form ng-submit="viewBuilding()">
+        <div class="form-group">
+            <label>Building Name</label>
+            <input type="text" class="form-control" ng-model="buildingName" required>
+        </div>
+        <button type="submit" class="btn btn-primary">View Building</button>
+    </form>
+
+    <!-- 등록 결과 및 조회 정보 -->
+    <div>
+        <h3>Registration Result:</h3>
+        <p>{{ registerUserResult }}</p>
+    </div>
+    <div>
+        <h3>Building Information:</h3>
+        <p>{{ buildingInfo }}</p>
+    </div>
 </div>
 
-<!-- 부동산 등록 폼 추가 -->
-<div class="form-group">
-  <label>Register Property</label>
-  <input class="form-control" type="text" placeholder="Property ID" ng-model="property.id">
-  <input class="form-control" type="text" placeholder="Owner ID" ng-model="property.ownerId">
-  <input class="form-control" type="text" placeholder="Description" ng-model="property.description">
-  <input type="submit" value="Register Property" class="btn btn-primary" ng-click="registerProperty()">
-</div>
-  </body>
-  <script type="text/javascript" src="app.js"> </script>
- </html>
- 
+<script src="app.js"></script>
+</body>
+</html>
