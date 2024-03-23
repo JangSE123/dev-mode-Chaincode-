@@ -24,6 +24,7 @@ $scope.viewBuilding = function() {
     });
 };
 
+
 });
 
 app.factory('appFactory', function($http) {
