@@ -22,7 +22,24 @@ app.controller('AppCtrl', function($scope, appFactory) {
             $scope.buildingInfo = data;
         });
     };
+
+    // JSON 데이터를 한 줄씩 내려서 표시하는 함수
+    $scope.formatBuildingInfo = function(buildingInfo) {
+        if (!buildingInfo) return ''; // 데이터가 없을 경우 빈 문자열 반환
+
+        // JSON 데이터를 파싱하여 객체로 변환
+        var buildingObj = JSON.parse(buildingInfo);
+
+        // 객체의 각 속성을 반복하면서 속성 이름과 값을 새 줄에 하나씩 표시
+        var formattedInfo = '';
+        for (var key in buildingObj) {
+            formattedInfo += key + ': ' + buildingObj[key] + '\n';
+        }
+
+        return formattedInfo; // 포맷팅된 문자열 반환
+    };
 });
+
 
 app.factory('appFactory', function($http) {
     var factory = {};
