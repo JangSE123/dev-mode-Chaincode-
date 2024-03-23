@@ -25,6 +25,47 @@ app.get('/query', function (req, res) {
    sdk.send(true, 'Query', args, res);
 });
 
+app.post('/registerUser', function (req, res) {
+   let userID = req.body.userID;
+   let name = req.body.name;
+   let args = [userID, name];
+   sdk.send(false, 'RegisterUser', args, res);
+});
+
+// 부동산 등록
+app.post('/registerProperty', function (req, res) {
+   let propertyID = req.body.propertyID;
+   let ownerID = req.body.ownerID;
+   let description = req.body.description;
+   let args = [propertyID, ownerID, description];
+   sdk.send(false, 'RegisterProperty', args, res);
+});
+
+// 부동산 정보 업데이트
+app.post('/updatePropertyDescription', function (req, res) {
+   let propertyID = req.body.propertyID;
+   let newDescription = req.body.newDescription;
+   let args = [propertyID, newDescription];
+   sdk.send(false, 'UpdatePropertyDescription', args, res);
+});
+
+// 부동산 조회
+app.get('/queryProperty', function (req, res) {
+   let propertyID = req.query.propertyID;
+   let args = [propertyID];
+   sdk.send(true, 'QueryProperty', args, res);
+});
+
+// 소유권 이전
+app.post('/transferPropertyOwnership', function (req, res) {
+   let propertyID = req.body.propertyID;
+   let newOwnerID = req.body.newOwnerID;
+   let args = [propertyID, newOwnerID];
+   sdk.send(false, 'TransferPropertyOwnership', args, res);
+});
+
 app.use(express.static(path.join(__dirname, '../client')));
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
+
+
